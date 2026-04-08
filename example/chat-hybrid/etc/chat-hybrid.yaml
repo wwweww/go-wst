@@ -1,0 +1,41 @@
+Name: chat-hybrid
+
+# Protocol selection: auto | websocket | webtransport
+Protocol: auto
+
+# WebSocket configuration (via Envoy Gateway)
+Ws:
+  Name: chat-hybrid-ws
+  Addr: :9004
+  Path: /ws
+  MaxConnections: 10000
+  PingInterval: 30s
+  PongWait: 60s
+
+# WebTransport configuration (direct connection)
+Wt:
+  Name: chat-hybrid-wt
+  Addr: :9005
+  Path: /wt
+  # Option 1: File paths
+  CertFile: certs/cert.pem
+  KeyFile: certs/key.pem
+  # Option 2: Environment variables (K8s secret as env var, takes priority)
+  # CertEnvVar: WT_TLS_CERT
+  # KeyEnvVar: WT_TLS_KEY
+  MaxConnections: 10000
+
+# Fallback strategy
+FallbackStrategy: auto
+FallbackDelay: 1s
+MaxRetries: 3
+
+# Hybrid authentication
+# WebSocket: Envoy ext_authz validates, sets X-User-ID header
+# WebTransport: Direct connection, validates JWT from query param
+Auth:
+  Enabled: true
+  WsHeaderName: X-User-ID
+  WtTokenSource: query
+  WtTokenName: token
+  WtJWTSecret: chat-secret

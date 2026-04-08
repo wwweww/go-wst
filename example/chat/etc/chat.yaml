@@ -1,0 +1,20 @@
+Name: chat-server
+
+# Network configuration
+Addr: :9001
+Path: /ws
+
+# Buffer configuration
+ReadBufferSize: 4096
+WriteBufferSize: 4096
+
+# Connection limits
+MaxConnections: 10000
+
+# Heartbeat configuration
+PingInterval: 30s
+PongWait: 60s
+
+# Message limits
+MaxMessageSize: 65536
+WriteTimeout: 10s

@@ -1,0 +1,43 @@
+Name: chat-wt
+
+# Network (WebTransport requires HTTPS)
+Addr: :9003
+Path: /wt
+
+# TLS (required for WebTransport)
+# Option 1: File paths (local dev / K8s secret mounted as volume)
+# Generate self-signed certs: openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes
+CertFile: certs/cert.pem
+KeyFile: certs/key.pem
+
+# Option 2: Environment variables (K8s secret as env var)
+# CertEnvVar: WT_TLS_CERT  # Env var name containing PEM certificate content
+# KeyEnvVar: WT_TLS_KEY    # Env var name containing PEM key content
+#
+# K8s deployment example:
+#   env:
+#     - name: WT_TLS_CERT
+#       valueFrom:
+#         secretKeyRef:
+#           name: my-tls-secret
+#           key: tls.crt
+#     - name: WT_TLS_KEY
+#       valueFrom:
+#         secretKeyRef:
+#           name: my-tls-secret
+#           key: tls.key
+#
+# Priority: CertEnvVar/KeyEnvVar > CertFile/KeyFile
+
+# Connection limits
+MaxConnections: 10000
+MaxStreamsPerConn: 100
+
+# Buffer
+ReadBufferSize: 4096
+WriteBufferSize: 4096
+
+# Timeouts
+IdleTimeout: 120s
+KeepAliveInterval: 30s
+WriteTimeout: 10s
