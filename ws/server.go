@@ -271,7 +271,6 @@ func (s *Server) writePump(conn *Connection) {
 		case <-conn.Done():
 			return
 		case message, ok := <-conn.send:
-			conn.SetReadDeadline(time.Now().Add(s.conf.WriteTimeout))
 			if !ok {
 				conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 				return
