@@ -2,7 +2,9 @@ package hybrid
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"strconv"
 	"strings"
 	"time"
 
@@ -119,16 +121,20 @@ func (a *HybridAuthenticator) authenticateJWT(req *protocol.AuthRequest) (string
 
 	// 提取用户 ID
 	mapClaims := claims.Claims.(*jwt.MapClaims)
-	if sub, ok := (*mapClaims)["sub"]; ok {
-		if userID, ok := sub.(string); ok {
-			return userID, nil
-		}
-	}
 
-	// 尝试其他常见字段
-	if uid, ok := (*mapClaims)["user_id"]; ok {
-		if userID, ok := uid.(string); ok {
-			return userID, nil
+	// 尝试常见字段名，支持 string 和 numeric 类型
+	for _, field := range []string{"sub", "user_id", "UserId", "userId", "uid"} {
+		if val, ok := (*mapClaims)[field]; ok {
+			switch v := val.(type) {
+			case string:
+				if v != "" {
+					return v, nil
+				}
+			case float64:
+				return strconv.FormatInt(int64(v), 10), nil
+			case json.Number:
+				return v.String(), nil
+			}
 		}
 	}
 

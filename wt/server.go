@@ -294,7 +294,6 @@ func (s *Server) handleStream(conn *Connection, stream *webtransport.Stream) {
 // writePump drains the connection's send channel and writes each message
 // back to the client on the bidirectional stream.
 func (s *Server) writePump(conn *Connection) {
-	// Wait for the first bidirectional stream to be accepted and set.
 	select {
 	case <-s.done:
 		return
